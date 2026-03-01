@@ -11,14 +11,15 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
 
-# Conexión a MongoDB
+# Conexión
 MONGO_URI = os.getenv('MONGO_URI')
 cliente = MongoClient(MONGO_URI)
-db = cliente['autopartes']          # Base de datos
-coleccion = db['piezas']             # Colección de piezas
-usuarios = db['usuarios']            # Colección para autenticación
+db = cliente['autopartes']          #BBDD
+coleccion = db['piezas']             
+usuarios = db['usuarios']           
 
-# Decorador para rutas protegidas
+
+#Protector rutas --> solo deja a usuarios autentificados
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -28,20 +29,20 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# -------------------- RUTAS PÚBLICAS --------------------
+#RUTAS PÚBLICAS
 
 @app.route('/')
 def inicio():
-    # Estadística: número de piezas en catálogo
+  
     total_piezas = coleccion.count_documents({})
     return render_template('inicio.html', total=total_piezas)
 
 @app.route('/catalogo')
 def catalogo():
-    piezas = list(coleccion.find({}, {'_id': 0}))  # Excluimos _id para simplificar
+    piezas = list(coleccion.find({}, {'_id': 0}))  
     return render_template('read.html', piezas=piezas)
 
-# -------------------- CRUD (solo para usuarios autenticados) --------------------
+# CRUD (solo si inicias sesion --> te autentificas)
 
 @app.route('/nueva', methods=['GET', 'POST'])
 @login_required
@@ -97,7 +98,7 @@ def confirmar_eliminar(nombre):
     flash('Pieza eliminada', 'success')
     return redirect(url_for('catalogo'))
 
-# -------------------- AUTENTICACIÓN --------------------
+# AUTENTICACIÓN 
 
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
