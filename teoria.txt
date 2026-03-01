@@ -1,0 +1,351 @@
+Flask es un microframework de Python ligero y flexible diseñado para crear aplicaciones web y APIs RESTful de forma rápida y sencilla. Basado en herramientas como Jinja2 y Werkzeug, permite iniciar un servidor web con pocas líneas de código sin imponer una estructura rígida. Ideal para desarrolladores que buscan libertad y minimalismo.
+
+Flask
+Logo Flask
+DEPENDENCIAS
+A medida que evolucione nuestr aplicación, seguramente necesitemos añadir otras librerías, pero para comenzar a trabajar, bastará con instalar flask:
+
+
+pip install flask
+ESTRUCTURA BÁSICA API
+
+#Importación de módulos
+from flask import Flask
+
+#Creación de una instancia de la clase Flask
+app = Flask(__name__)
+
+#Definición de los endpoints usando decoradores
+@app.route('/', methods=['GET'])
+#Definición de la función que ejecuta dicho endpoint
+def raiz():
+    return "Hola desde Flask"
+
+#Definición del bloque IfName, para controlar la ejecución del módulo principal.
+if __name__ == '__main__':
+    app.run(debug=True)
+EJECUCIÓN DEL SERVIDOR DE PRUEBAS
+Flask por defecto, levanta un servidor local sobre el puerto 5000, para que podamos testear nuestro código. Si nuestro módulo se llama app.py, podemos ejecutarlo con:
+
+
+flask run 
+Pero si queremos realizar pruebas con diferentes módulos que tengan otros nombres, lo ejecutaremos con:
+
+
+flask --app mimodulo.py --debug run 
+TIPOS DE RUTAS PARA LOS ENDPOINT
+RUTA ESTÁTICA
+Se especifica una ruta fija para el endpoint:
+
+
+@app.route('/blog', methods=['GET'])
+def blog():
+    return "Bienvenido a la seción BLOG"
+RUTA VARIABLE
+El endpoint contiene un parámetro variable y dependiendo de su valor, se mostrará un contenido u otro:
+
+
+@app.route('/blog/<id_articulo>', methods=['GET'])
+def articulo(id_articulo):
+    return f"Estas viendo el árticulo nº {id_articulo} del BLOG"
+TIPOS DE MÉTODOS PARA LOS ENDPOINT
+Método	Acción	Descripción
+GET	Read	 Obtiene información del servidor.
+PUT	Write	 Crea un recurso nuevo.
+POST	Update	 Reemplaza un recurso completo.
+PATCH	Update	 Modifica parte de un recurso.
+DELETE	Remove	 Borra un recurso completo.
+TIPOS DE RETURN PARA LOS ENDPOINTS
+TEXTO PLANO
+Es la opción más simple y generalmente solo la usamos para probar el funcionamiento inicial de nuestra app:
+
+
+@app.route('/', methods=['GET'])
+def raiz():
+    return "Bienvenido a mi app web"
+FICHERO JSON
+Flask incluye la funcionalidad jsonify, que convierte automaticamente diccionarios, listas u otros objetos Python en una respuesta JSON válida, estableciendo el Content-Type a "application/json". Es muy útil cuando queremos crear una API:
+
+
+from flask import jsonify
+
+estudiantes = [
+    {"id": 1, "nombre": "Ana", "edad": 20},
+    {"id": 2, "nombre": "Luis", "edad": 22},
+    {"id": 3, "nombre": "María", "edad": 21}]
+
+@app.route('/students', methods=['GET'])
+def get_students():
+    return jsonify(estudiantes)
+DOCUMENTO HTML
+Flask tambien nos permite devolver directamente el contenido de un documento HTML, usando la función render_template, que carga y procesa este tipo de archivos utilizando el motor Jinja2. Para ello, es estrictamente necesario que estos ficheros HTML se encuentren en la carpeta templates (que deberemos crear en nuestro proyecto):
+
+
+from flask import render_template
+
+@app.route('/', methods=['GET'])
+def raiz():
+    return render_template("base.html")
+USO DE PLANTILLAS CON JINJA2
+Jinja2
+Logo Jinja2
+Flask incluye un motor de plantillas llamado Jinja2, que permite, no solo renderizar documentos HTML, si no que también podemos pasarles variables y aplicar sobre ellas estructuras de programación como condicionales y bucles.
+
+DELIMITADORES EN JINJA2
+{% %}: Declaración de sentencias de control de flujo (condicionales, bucles...) y operaciones con plantillas.
+
+{{ }}: Evaluar y mostrar valores devueltos por las sentencias anteriores.
+
+USO DE VARIABLES EN JINJA2
+Cuando renderizamos un archivo HTML con Jinja2, podemos pasarle variables y dependiendo de sus valores mostrar unas cosas u otras. Por ejemplo, en el endpoint podemos devoler lo siguiente:
+
+
+@app.route('/blog', methods=['GET'])
+def blog():
+    return render_template("blog.html", autor="ProfeDIW", logeado=False)
+USO CONDICIONALES EN JINJA2
+Siguiente con el ejemplo anterior, dentro del código de "blog.html", podemos utilizar las variables que hemos pasado, ya sea para mostrar su valor o usarlas en condicionales:
+
+
+<h2>Bienvenido al blog</h2>
+<p>Mi nombre es {{ autor }}, y soy el creador de este sitio.</p>
+{% if logeado %}
+<p>Has iniciado sesión correctamente.</p>
+{% else %}
+<p>Necesitas iniciar sesión para ver este contenido.</p>
+{% endif %}
+USO DE BUCLES EN JINJA2
+Del mismo modo, también podemos utilizar bucles for dentro de un HTML, mediante los delimitadores Jinja2. Por ejemplo, imaginemos que tenemos una lista de alumnos llamada "estudiantes" y queremos imprimir una tarjeta por cada persona en la lista. No será necesario escribir el código muchas veces, simplemente podríamos aplicar algo como lo siguiente:
+
+
+{% for alumno in estudiantes %}
+ <div class="card">
+  <div class="card-content">
+    <h2> {{alumno.nombre}} </h2>
+    <h3> Curso: {{alumno.curso}} </h3>
+    <h3> Edad: {{alumno.edad} }</h3>
+  </div>
+ </div>
+{% endfor %}
+HERENCIA DE PLANTILLAS EN JINJA2
+Otra gran ventaja de las plantillas es evitar la repetición de código HTML, mediante el uso de la herencia.
+
+Esto nos permite usar un documento "base.html", en el que incluiremos todo el código que sea común a todas las páginas de nuestra aplicación web.
+
+De este modo, en cada página específica solo tendremos que aplicar la sentencia extends y añadir el contenido a mostrar mediante un bloque de contenido, block. Por ejemplo, la plantilla base.html, podría tener el siguiente aspecto:
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Base</title>
+</head>
+<body>
+    {%block contenidos%}
+    {%end block%}    
+</body>
+</html>
+Y por otro lado, en las diferentes páginas tendríamos algo parecido a esto:
+
+
+{% extends "base.html" %}
+
+{% block contenidos %}
+<h2>Contenido exclusivo de esta página</h2>
+{% endblock %}
+Podemos utilizar estilos predefinidos como los de Bootswatch en nuestros templates, para darle un diseño más profesional y de forma rápida a nuestra app web.
+
+FORMULARIOS WTF
+WTForms
+Logo WTForms
+Existe también una extensión para Flask llamada Flask-WTF, la cual integra la biblioteca WTForms, que nos permite definir formularios web como clases Python, facilitando mucho la creación, renderizado y validación segura de estos.
+
+DEPENDENCIAS WTFORMS
+Necesitaremos instalar la siguiente extensión:
+
+
+pip install flask-wtf
+USO DE WTFORMS
+Ante cualquier duda o error, podemos consultar su documentación oficial, sin embargo, a continuación algunos pasos básicos que nos van a ayudar a familiarizarnos con su uso:
+
+ IMPORTAR MÓDULOS
+Necesitaremos importar los siguientes componentes:
+
+
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+ CREAR CLAVE SECRETA
+Lo primero que debemos hacer es crear una clave secreta SECRET_KEY, que Flask-WTF utilizará para firmar criptográficamente los tokens CSRF (Cross-Site Request Forgery) y las cookies de sesión. Garantizando así la seguridad de los formularios y previniendo ataques de terceros o peticiones maliciosas.
+
+Esta clave consistirá en una cadena de caracteres aleatorios, que se recomienda que sea larga y compleja para mayor seguridad. Por ejemplo:
+
+
+app.config['SECRET_KEY']="a262hs7sjd893jd74ejd83hwnsgh2y262h"
+ DEFINIR NUESTRA CLASE FORMULARIO
+Podemos crear un módulo formularios.py, donde definir todos nuestros formularios como clases de Python. Por ejemplo, si queremos añadir un formulario de registro, podría ser algo así:
+
+
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+
+class SignUpForm(FlaskForm):
+    usuario = StringField('Username')
+    contraseña = PasswordField('Password')
+    confirmar = SubmitField('Sign up')
+ USAR NUESTRO FORMULARIO EN EL HTML Y EL ENDPOINT
+A la hora de definir el endpoint, podemos hacerlo así:
+
+
+from formularios import SignUpForm
+
+@app.route('/signup', methods=['GET', 'POST'])
+ def signup():
+    formulario = SignUpForm()
+    return render_template("blog.html", form=formulario)
+Luego en el HTML:
+
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2> Sign Up </h2>
+<form action="" method="POST">
+    <p>
+        {{ form.usuario.label }} <br>
+        {{ form.usuario(size=30) }}
+    </p>
+    <p>
+        {{ form.contraseña.label }} <br>
+        {{ form.contraseña(size=30) }}
+    </p>
+    <p>{{ form.confirmar() }}</p>
+</form>
+
+{% endblock %}
+ RECUPERAR DATOS DE UN FORMULARIO
+Próximamente...🚧👷‍♂️🚧
+
+ENLACES HTML A LOS DIFERENTES ENDPOINTS
+Una vez tengamos definida nuestra estructura de plantillas Flask (templates), cuando queramos movernos entre ellas usando enlaces dentro del código HTML (<a href="">), no lo haremos indicando el nombre del documento html, que es lo que solemos hacer cuando estamos programando un sitio web normal.
+
+En este caso, como estamos usando Flask y su motor de plantillas Jinja2, debemos enlazarlo con el comando url_for() e indicar dentro el nombre de la función a la que queremos llamar (sin parentesis), es decir, la función que ejecuta alguno de nuestros endpoints. Por ejemplo:
+
+
+<a class="nav-link" href="{{ url_for('blog') }}">Abrir Blog</a>
+PERSISTENCIA EN MONGODB
+MongoDB
+Logo MongoDB
+INTRODUCCIÓN A MONGODB
+MongoDB es una base de datos NoSQL de código abierto, orientada a documentos y de alto rendimiento, diseñada para la flexibilidad y escalabilidad en el desarrollo moderno.
+
+En lugar de tablas y filas, utiliza documentos tipo JSON (con almacenamiento BSON binario) agrupados en colecciones, lo que permite manejar datos estructurados, semiestructurados y no estructurados con esquemas dinámicos.
+
+DEPENDENCIAS MONGO
+Insalaremos la siguiente librería para poder interactuar con nuestra BBDD Mongo:
+
+
+pip install pymongo
+LEVANTAR MONGODB EN UN CONTENEDOR
+Podríamos hacerlo mediante el comando "docker run", pero queremos poder gestionar nuestra BBDD también a través de una interfaz gráfica. Es por ello que levantaremos 2 servicios interconectados, mongoDB y mongoXpress, usando la utilidad docker compose. A continuación se adjunta una sugerencia de configuración para el fichero .YAML:
+
+docker-compose.yml
+Para levantar los servicios definidos en el fichero anterior, abrimos un terminal y nos ubicamos en la carpeta donde se encuentre, luego lanzamos el comando:
+
+
+docker compose up -d
+VINCULAR MI API CON MONGO
+IMPORTAMOS LA LIBRERIA
+
+from pymongo import MongoClient
+CADENA DE CONEXIÓN A MONGO
+Para conectarnos el sistema de Mongo desde otras aplicaciones o herramientas, se utiliza un parámetro llamado MONGO_URI, el cual podemos definir en una variable de entorno. Su estructura es la siguiente:
+
+
+# El Nombre de la BBDD es opcional:
+mongodb://[usuario]:[contraseña]@[hostname]:[puerto]/[nombreBBDD]
+En nuestro código Python, realizamos la conexión mediante el método MongoClient y la podemos asignar a una variable, para usarla de manera sencilla cuando queramos realizar operaciones en Mongo:
+
+
+cliente = MongoClient("mongodb://root:pass123@mongo:27017")
+EJEMPLOS ÚTILES DE OPERACIONES EN MONGO DESDE PYTHON
+CREAR UNA BBDD NUEVA
+
+# Creamos una BBDD llamada COLEGIO y dentro de ella, una tabla llamada ALUMNOS
+new_db = cliente['colegio']
+tabla_alumnos = new_db['alumnos']
+LISTAR TODOS LOS REGISTROS DE UNA tabla
+
+alumnado = list(tabla_alumnos.find({}, {'_id': 0}))
+DEVOLVER UN ALUMNO POR SU ID
+
+alumno = tabla_alumnos.find_one({"id_alumno":myid}, {"_id":0})
+BORRAR UN ALUMNO POR SU ID
+
+borrado = tabla_alumnos.delete_one({"id_alumno": int(myid)})
+DOCKERIZAR NUESTRA APLICACIÓN WEB
+En construcción...🚧👷‍♂️🚧
+
+DJANGO 
+Django
+Logo de Django
+INTRODUCCIÓN A DJANGO
+Como ya habíamos mencionado, Django es un framework de código abierto basado en Python, que nos permite crear sitios web complejos de forma rápida y sencilla.
+
+Ya que nos permite simplificar las tareas repetiticas y pesadas que pueden darse a la hora de desarrollar este tipo de aplicaciones.
+
+MODELO VISTA CONTROLADOR (MVC)
+Este modelo se basa en dividir una aplicación en 3 grandes módulos:
+
+MODELO: se encarga de gestionar la información almacenada en una Base de Datos.
+
+VISTA: define todo lo referente a la interfaz grafica de usuario (GUI), es decir, que es lo que el usuario ve (Frontend); tanto a la hora de hacer una petición, como a la hora de visualizar la información solicitada.
+
+CONTROLADOR: encargado de gestionar las comunicaciones entre la VISTA y el MODELO.
+
+Modelo Vista Controlador
+Modelo Vista Controlador
+Este modelo hace que nuestras aplicaciones sean más funcionales y faciles de mantener y escalar. Es por ello que la muchos de los principales frameworks de desarrollo de aplicaciones se basan en él.
+
+Aunque Django no usa exactamente este modelo, su filosofia es exactamente la misma. Se podría decir que es un MVC personalizado, llamado Model Template View (MTV), donde el Template = Vista y el View = Controlador.
+
+PRIMEROS PASOS CON DJANGO
+En primer lugar, creamos una nueva carpeta para nuestros proyectos Django y la abrimos en Visual Studio Code. Luego creamos nuestro entorno virtual, lo activamos e instalamos Django en él:
+
+
+python -m venv envDjango
+
+.\envDjango\Scripts\activate
+
+pip install django
+
+python -m django --version
+Para crear nuestro primer proyecto, podemos hacerlo con el siguiente comando:
+
+
+django-admin startproject Proyecto1
+Prácticamente todo proyecto de Django (se presupone que si usamos este framework es porque estamos desarrollando una aplicación medianamente compleja) estará compuesto por una o varias apps. Las apps, no son más que bloques de código separados que podremos reutilizar dentro de otros proyectos.
+
+Para crear nuestra primera app, accedemos a la carpeta que se ha creado con el nombre de nuestro proyecto y ejecutamos lo siguiente:
+
+
+cd Proyecto1
+python manage.py startapp InicioSesion
+BBDD EN DJANGO -- En construcción... 🚧 --
+
+# En el "models.py" creamos tantas clases como tablas vaya a tener nuestra BBDD, para esta App.
+# En el "settings.py" añadimos nuestra App en la lista de "INSTALED APPS"
+
+# Para comprobar si hay algun problema en nuestro código:
+python manage.py check InicioSesion
+
+# Para crear la BBDD vacía (esto nos devuelve un nº de migración, por ejemplo 0001)
+python manage.py makemigrations
+
+# Para generar las tablas definidas en el "models.py" (debemos indicar el nº de miración anterior):
+python manage.py sqlmigrate InicioSesion 0001
+
+# Para incorportar esas tablas a nuestra BBDD:
+python manage.py migrate

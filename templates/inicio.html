@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+<div class="jumbotron">
+    <h1 class="display-4">Bienvenido a AutoPartes-Transformer-Decepticon</h1>
+    <p class="lead">Tu catálogo de piezas para coches y motos</p>
+    <hr class="my-4">
+    <p>Actualmente tenemos <strong>{{ total }}</strong> piezas en catálogo.</p>
+    <a class="btn btn-primary btn-lg" href="{{ url_for('catalogo') }}" role="button">Ver catálogo</a>
+</div>
+{% endblock %}

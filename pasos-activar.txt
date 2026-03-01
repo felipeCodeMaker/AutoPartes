@@ -1,0 +1,32 @@
+
+Terminal
+
+ProyectoPython\Scripts\activate
+
+o
+
+ProyectoPython2Ev\Scripts\activate
+
+Cerrar entorno
+    deactivate
+
+FLASK
+flask --debug run       --> Ejecución local sin docker
+
+DOCKER
+docker compose up -d --build
+docker compose up -d
+
+docker ps -a
+
+docker stop mongoDB
+
+docker rm mongoDB
+
+docker stop mongoExpress flask-app
+docker rm mongoExpress flask-app
+
+docker compose ps
+
+
+docker rm mongoDB mongoExpress flask-app mongo-express

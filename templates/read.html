@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+<h2>Catálogo de piezas</h2>
+{% if piezas %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Categoría</th>
+                {% if session.usuario %}
+                    <th>Acciones</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for pieza in piezas %}
+            <tr>
+                <td>{{ pieza.nombre }}</td>
+                <td>{{ pieza.descripcion }}</td>
+                <td>{{ pieza.precio }} €</td>
+                <td>{{ pieza.stock }}</td>
+                <td>{{ pieza.categoria }}</td>
+                {% if session.usuario %}
+                <td>
+                    <a href="{{ url_for('editar', nombre=pieza.nombre) }}" class="btn btn-sm btn-warning">Editar</a>
+                    <a href="{{ url_for('eliminar', nombre=pieza.nombre) }}" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No hay piezas en el catálogo.</p>
+{% endif %}
+{% endblock %}

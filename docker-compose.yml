@@ -1,0 +1,62 @@
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongoDB
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - mi-red
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongoExpress
+    restart: always
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ROOT}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASS}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_ROOT}:${MONGO_PASS}@mongo:27017/
+      ME_CONFIG_BASICAUTH: true
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGOEX_USER}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGOEX_PASS}
+    ports:
+      - "8081:8081"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - mi-red
+
+  web:
+    build: .
+    container_name: flask-app
+    restart: always
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    environment:
+      MONGO_URI: mongodb://${MONGO_ROOT}:${MONGO_PASS}@mongo:27017/autopartes?authSource=admin
+      SECRET_KEY: ${SECRET_KEY}
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - mi-red
+
+volumes:
+  mongo_data:
+
+networks:
+  mi-red:
+    driver: bridge

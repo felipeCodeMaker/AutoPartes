@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+<h2>Iniciar sesión</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+        {{ form.usuario.label(class="form-label") }}
+        {{ form.usuario(class="form-control") }}
+        {% for error in form.usuario.errors %}
+            <span class="text-danger">{{ error }}</span>
+        {% endfor %}
+    </div>
+    <div class="mb-3">
+        {{ form.password.label(class="form-label") }}
+        {{ form.password(class="form-control") }}
+        {% for error in form.password.errors %}
+            <span class="text-danger">{{ error }}</span>
+        {% endfor %}
+    </div>
+    {{ form.submit(class="btn btn-primary") }}
+</form>
+{% endblock %}

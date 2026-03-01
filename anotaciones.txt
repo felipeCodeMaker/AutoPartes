@@ -1,0 +1,23 @@
+Proyecto Python
+
+    FLASK
+        JINJA 2
+        WTForms
+        
+    MongoDB
+
+    Docker
+_____________________________________________________________-
+
+    Backend
+        Flask   -   Jinja 2 y WTForms
+        API
+        MongoDB
+        
+        
+    Frontend
+        HTML
+        CSS
+        JavaScript
+        
+        
